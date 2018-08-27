@@ -1,0 +1,99 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<style>
+    /*.center {
+        margin-top: auto;
+        margin-bottom: auto;
+    }
+    .mycontainer {
+        position: relative;
+        height: 14rem;
+        border: 1px solid;
+    }
+
+    .jumbotron {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%,-50%);
+        border: 1px dashed deeppink;
+    }*/
+
+    .vertical-center {
+        min-height: 100%; /* Fallback for browsers do NOT support vh unit */
+        min-height: 100vh; /* These two lines are counted as one 🙂       */
+        display: flex;
+        align-items: center;
+    }
+
+    .full_input {
+        display: inline-block;
+        width: 100%;
+    }
+
+    .result-container {
+        margin-top: 50px;
+    }
+</style>
+<div class="vertical-center">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <div class="row">
+                    <div class="col-md-2"><label>Product url</label></div>
+                    <div class="col-md-6"> <input id="product_url" class="full_input" /></div>
+                    <div><button class="open_product">Open</button></div>
+                </div>
+            </div>
+        </div>
+        <div class="row result-container">
+            <div class="col-md-3">
+                <p>Seed keywords</p>
+                <textarea id="seeds" class="full_input" rows="10"></textarea>
+            </div>
+            <div class="col-md-2"><button class="generate_keyword">Generate</button></div>
+            <div class="col-md-5">
+                <p>Relevant keywords</p>
+                <textarea class="full_input" rows="10"></textarea>
+            </div>
+        </div>
+    </div>
+
+</div>
+@section Scripts
+    {
+    <script>
+    $(document).ready(function () {
+        $(".open_product").click(function () {
+            var dataJson = {
+                url: $("#product_url").val()
+             }
+            $.post("@Url.Action("_OpenProduct")", dataJson, function (data) {
+
+                $('#seeds').val(data.join('\n'))
+                console.log(data);
+            });
+        });
+
+        $(".generate_keyword").click(function () {
+            var lines = $('#seeds').val().split(/\n/);
+            var texts = [];
+            for (var i = 0; i < lines.length; i++) {
+                if (/\S/.test(lines[i])) {
+                    texts.push($.trim(lines[i]));
+                }
+            }
+            $.post("@Url.Action("_GenerateKeywords")", { keywords: texts },function (data) {
+                console.log(data);
+            });
+        });
+    });
+    </script>
+}
+
+
+
+
+
