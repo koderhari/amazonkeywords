@@ -10,10 +10,4 @@
     <WarningLevel>3</WarningLevel>
   </PropertyGroup>
 
-  <ItemGroup>
-    <None Update="SmartStoplist.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
 </Project>

@@ -5,26 +5,29 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using KeyGenerator.Site.Models;
+using KeyGenerator.Core.Parsers.Interfaces;
 
 namespace KeyGenerator.Site.Controllers
 {
     public class HomeController : Controller
     {
+        private IKeywordsService _keywordsService;
+
+        public HomeController(IKeywordsService keywordsService)
+        {
+            _keywordsService = keywordsService;
+        }
+
         public IActionResult Index()
         {
             return View();
         }
 
         [HttpPost]
-        public IActionResult _OpenProduct(string url)
+        public async Task<IActionResult> _OpenProduct(string url)
         {
-            var sees = new List<string>
-            {
-                "dsadsa",
-                "sss",
-                "wwww",
-            };
-            return Json(sees);
+            var seeds =await  _keywordsService.ExctractKeywordsForProductPageAsync(url);
+            return Json(seeds);
         }
 
         [HttpPost]

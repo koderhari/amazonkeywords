@@ -30,6 +30,7 @@ Use Alexa on Fire TV to control playback of content (play, pause, resume) in man
 
 Fire TV Cube will support sleep timers later this year.Alexa Calling & Messaging, multi-room music, and Bluetooth connections to mobile phones are not currently supported on Fire TV Cube. 
         ";
+        private static HttpClient _single_httpClient;
 
         static void producer()
         {
@@ -82,10 +83,11 @@ Fire TV Cube will support sleep timers later this year.Alexa Calling & Messaging
         }
 
 
+
         public static async Task Main(string[] args)
         {
-            var r = new Rake("SmartStoplist.txt",3,2);
-            var tt=r.Run(txt);
+            //var r = new Rake("SmartStoplist.txt",3,2);
+            //var tt=r.Run(txt);
             //TestBC();
             var urlTemplate = "https://completion.amazon.com/search/complete?mkt=1&l=en_US&sv=desktop&search-alias=aps&q={0}";
             Console.WriteLine();
@@ -95,6 +97,21 @@ Fire TV Cube will support sleep timers later this year.Alexa Calling & Messaging
             //    UseProxy = true
             //};
             //using (var client = new HttpClient(httpClientHandler))
+
+
+            using (var client = new HttpClient())
+            {
+
+                client.DefaultRequestHeaders.Add("UserAgent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36");
+
+                //string apiUrl = "http://yourserver.com/postpage";
+                //StringContent content = new System.Net.Http.StringContent("{dataelem:value}", Encoding.UTF8, "application/json");
+                //var url = string.Format(urlTemplate, "tablet");
+                var url = "https://www.amazon.com/Blue-Devils-Adult-Classic-Hoody/dp/B071V38NHF?pd_rd_wg=BdU8v&pd_rd_r=66ef0420-517f-4fa1-9608-9dafe54da58f&pd_rd_w=WqUcY&ref_=pd_gw_simh&pf_rd_r=JS6339TM8E7XNNTZECRK&pf_rd_p=b841581f-e864-5164-afa6-4c18a8348879";
+                var response = client.GetAsync(url).Result;
+                Console.WriteLine(response.Content.ReadAsStringAsync().Result);
+            }
+
             using (var client = new HttpClient())
             {
 
@@ -125,25 +142,36 @@ french parfume".Split("\r\n",StringSplitOptions.RemoveEmptyEntries);
 
             //var urls = GetUrls("tablet");
             var source = new ConcurrentQueue<string>();
-            var allUrls = new List<string>(370);
-            foreach (var word in words)
-            {
-                var urls = GetUrls(word.Trim());
-                foreach (var url in urls)
-                {
-                    allUrls.Add(url);
-                    source.Enqueue(url);
+            //var allUrls = new List<string>(370);
+            //foreach (var word in words)
+            //{
 
-                }
-                
-            }
+            //    var urls = GetUrls(word.Trim());
+            //    foreach (var url in urls)
+            //    {
+            //        allUrls.Add(url);
+            //        source.Enqueue(url);
 
+            //    }
+
+            //}
             Stopwatch stopWatch = new Stopwatch();
             stopWatch.Start();
+            var tasks = new List<Task>(370);
+            _single_httpClient = new HttpClient();
+            foreach (var word in words)
+            {
+                foreach (var url in GetUrlsEnum(word.Trim()))
+                {
+                    tasks.Add(Task.Run(() => ProccessAsync4(url)));
+                }
+            }
+
+
             //var tasks = allUrls.Select(x => ProccessAsync2(x)).ToArray(); 
             //var prox = GetProxies();
             //var tasks = prox.Select(x => ProccessAsync(x, source)).ToArray();
-            var tasks = allUrls.Select(x => Task.Run(() => ProccessAsync2(x))).ToArray();
+            //var tasks = allUrls.Select(x => Task.Run(() => ProccessAsync2(x))).ToArray();
             // var tasks = Enumerable.Range(1,10).Select(x => ProccessAsync3(source)).ToArray();
             //ForEachAsync(allUrls, 10, (x) => ProccessAsync2(x)).Wait();
             await Task.WhenAll(tasks);
@@ -200,6 +228,24 @@ french parfume".Split("\r\n",StringSplitOptions.RemoveEmptyEntries);
             return urls;
         }
 
+        public static IEnumerable<string> GetUrlsEnum(string queryWord)
+        {
+            var urlTemplate = "https://completion.amazon.com/search/complete?mkt=1&l=en_US&sv=desktop&search-alias=aps&q={0}";
+            yield return string.Format(urlTemplate, System.Web.HttpUtility.UrlEncode(queryWord));
+
+            for (int i = (int)'a'; i <= (int)'z'; i++)
+            {
+            
+                yield return string.Format(urlTemplate, System.Web.HttpUtility.UrlEncode($"{queryWord}{(char)i}"));
+            }
+
+            for (int i = (int)'0'; i <= (int)'9'; i++)
+            {
+                yield return string.Format(urlTemplate, System.Web.HttpUtility.UrlEncode($"{queryWord}{(char)i}"));
+            }
+            yield break;
+        }
+
         public static async Task ProccessAsync(string proxy, ConcurrentQueue<string> source)
         {
             var httpClientHandler = new HttpClientHandler
@@ -254,6 +300,31 @@ french parfume".Split("\r\n",StringSplitOptions.RemoveEmptyEntries);
                 }
 
             }
+        }
+
+        public static async Task ProccessAsync4(string url)
+        {
+            
+
+                //string apiUrl = "http://yourserver.com/postpage";
+                //StringContent content = new System.Net.Http.StringContent("{dataelem:value}", Encoding.UTF8, "application/json");
+                try
+                {
+
+                    var response = await _single_httpClient.GetAsync(url);
+                    var result = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine(url + result);
+                    //Console.WriteLine($"Response({proxy}): {url}" + response.Content.ReadAsStringAsync().Result);
+
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($" {e}");
+
+
+                }
+
+          
         }
 
         public static async Task ProccessAsync3(ConcurrentQueue<string> source)
