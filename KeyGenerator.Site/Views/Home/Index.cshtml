@@ -85,7 +85,7 @@
                     texts.push($.trim(lines[i]));
                 }
             }
-            $.post("@Url.Action("_GenerateKeywords")", { keywords: texts },function (data) {
+            $.post("@Url.Action("_GenerateKeywords")", { seeds: texts },function (data) {
                 console.log(data);
             });
         });

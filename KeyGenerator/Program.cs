@@ -163,7 +163,7 @@ french parfume".Split("\r\n",StringSplitOptions.RemoveEmptyEntries);
             {
                 foreach (var url in GetUrlsEnum(word.Trim()))
                 {
-                    tasks.Add(Task.Run(() => ProccessAsync4(url)));
+                    tasks.Add(Task.Run(() => ProccessAsync2(url)));
                 }
             }
 

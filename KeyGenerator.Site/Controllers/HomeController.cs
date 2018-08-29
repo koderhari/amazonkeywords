@@ -31,8 +31,9 @@ namespace KeyGenerator.Site.Controllers
         }
 
         [HttpPost]
-        public IActionResult _GenerateKeywords(string[] keywords)
+        public async Task<IActionResult> _GenerateKeywords(string[] seeds)
         {
+            var keywords = await _keywordsService.GetSuggestionsAsync(seeds);
             return Json(keywords);
         }
     }

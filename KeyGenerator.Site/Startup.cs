@@ -33,8 +33,8 @@ namespace KeyGenerator.Site
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
             services.AddHttpClient();
-            services.AddTransient<IProductParser, ProductParser>();
-            services.AddTransient<IKeywordsExtraction, RakeAlgorithm>(sp =>
+            services.AddSingleton<IProductParser, ProductParser>();
+            services.AddSingleton<IKeywordsExtraction, RakeAlgorithm>(sp =>
             {
                 //to-do move to settigns
                 return new RakeAlgorithm("SmartStoplist.txt", 3, 2);

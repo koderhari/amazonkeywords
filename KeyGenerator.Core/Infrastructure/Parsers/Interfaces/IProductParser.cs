@@ -7,6 +7,8 @@ namespace KeyGenerator.Core.Parsers.Interfaces
 {
     public interface IProductParser
     {
-        string Parse(string html);
+        string ParseProductPage(string html);
+
+        string[] ParseProductCompletion(string json);
     }
 }
