@@ -36,6 +36,35 @@
     .result-container {
         margin-top: 50px;
     }
+
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100%;
+        background: rgba( 255, 255, 255, .8 ) url('/ajax-loader.gif') 50% 50% no-repeat;
+    }
+
+    /* When the body has the loading class, we turn
+   the scrollbar off with overflow:hidden */
+    body.loading .modal {
+        overflow: hidden;
+    }
+
+    /* Anytime the body has the loading class, our
+   modal element will be visible */
+    body.loading .modal {
+        display: block;
+    }
+
+    textarea {
+        white-space: pre;
+        overflow-wrap: normal;
+        overflow-x: scroll;
+    }
 </style>
 <div class="vertical-center">
     <div class="container">
@@ -56,20 +85,30 @@
             <div class="col-md-2"><button class="generate_keyword">Generate</button></div>
             <div class="col-md-5">
                 <p>Relevant keywords</p>
-                <textarea class="full_input" rows="10"></textarea>
+                <textarea class="full_input" rows="10" id="keywords"></textarea>
             </div>
         </div>
     </div>
 
 </div>
+<div class="modal"></div>
 @section Scripts
     {
     <script>
     $(document).ready(function () {
+        $body = $("body");
+
+        $(document).on({
+            ajaxStart: function () { $body.addClass("loading"); },
+            ajaxStop: function () { $body.removeClass("loading"); }
+        });
+
         $(".open_product").click(function () {
             var dataJson = {
                 url: $("#product_url").val()
-             }
+            }
+            $('#seeds').val();
+            $('#keywords').val();
             $.post("@Url.Action("_OpenProduct")", dataJson, function (data) {
 
                 $('#seeds').val(data.join('\n'))
@@ -86,7 +125,7 @@
                 }
             }
             $.post("@Url.Action("_GenerateKeywords")", { seeds: texts },function (data) {
-                console.log(data);
+                $('#keywords').val(data.join('\n'))
             });
         });
     });

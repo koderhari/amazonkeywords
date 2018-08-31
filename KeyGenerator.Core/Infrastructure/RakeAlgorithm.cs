@@ -26,12 +26,24 @@ namespace KeyGenerator.Core.Infrastructure
         public List<string> Exctract(string text, int? top = null)
         {
             var result = Run(text);
+            //var words = phrase.Split(' ');
+
+            //if (words.Length > maxWordsLength) return false;
+            //var filterResult = new Dictionary<string, double>();
+            //foreach (var item in result)
+            //{
+            //    var words = item.Key.Split(' ');
+            //    if (words.Length > _maxWordsLength) continue;
+            //    filterResult[item.Key] = item.Value;
+            //}
+
+            var orderFilterResult = result.OrderByDescending(pair => pair.Value).Select(x => x.Key);
             if (top.HasValue)
             {
-                return result.Keys.Take(top.Value).ToList();
+                return orderFilterResult.Take(top.Value).ToList();
             }
 
-            return result.Keys.ToList();
+            return orderFilterResult.ToList();
         }
 
         public Dictionary<string, double> Run(string text)
@@ -227,7 +239,7 @@ namespace KeyGenerator.Core.Infrastructure
 
             var words = phrase.Split(' ');
 
-            if (words.Length > maxWordsLength) return false;
+            //if (words.Length > maxWordsLength) return false;
 
             var digits = 0;
             var alpha = 0;

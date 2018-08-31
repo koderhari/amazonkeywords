@@ -36,7 +36,7 @@ namespace KeyGenerator.Core.Infrastructure
             client.DefaultRequestHeaders.Add(HttpHeader.UserAgent, HttpHeader.UserAgent);
             var productPage = await client.GetStringAsync(url);
             var productDescription = _productParser.ParseProductPage(productPage);
-            return _keyWordExtractor.Exctract(productDescription, 10);
+            return _keyWordExtractor.Exctract(productDescription, 20);
         }
 
         public async Task<List<string>> GetSuggestionsAsync(string[] seeds)
